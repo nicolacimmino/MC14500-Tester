@@ -24,7 +24,7 @@ void setup()
 {
   releaseMC14500();
   setupTestHarness();
-  
+
   Serial.begin(9600);
 }
 
@@ -47,8 +47,17 @@ void loop()
            testOEN() &&
            testLD() &&
            testLDC() &&
-           testSTOH() &&
-           testSTOL();
+           testSTO() &&
+           testNOPO() &&
+           testORC() &&
+           testAND() &&
+           testANDC() &&
+           testXNOR() &&
+           testSTOC() &&
+           testJMP() &&
+           testRTN() &&
+           testSKZ() &&
+           testNOPF();
 
   digitalWrite(PIN_LED_GREEN, result);
   digitalWrite(PIN_LED_RED, !result);
@@ -58,8 +67,10 @@ void loop()
   // Hang here in case of failure so it's not missed
   // and we can leave the system unattended in ageing
   // mode while still catching random failures.
-  if(!result) {
-      while(true);
+  if (!result)
+  {
+    while (true)
+      ;
   }
 
   delay(2000);

@@ -9,8 +9,18 @@
 bool testLD();
 bool testLDC();
 bool testOEN();
-bool testSTOH();
-bool testSTOL();
+bool testSTO();
 bool testIEN();
+bool testNOPO();
+bool testORC();
+bool testAND();
+bool testANDC();
+bool testXNOR();
+bool testSTOC();
+bool testJMP();
+bool testRTN();
+bool testSKZ();
+bool testNOPF();
+
 
 #endif
