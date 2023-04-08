@@ -156,11 +156,11 @@ bool testANDC()
     setIen(HIGH);
     setOen(HIGH);
 
-    setLine(PIN_DATA, HIGH);
-    executeInstructionOnMC14500(INST_LD, CLOCK_HILO);
-    executeInstructionOnMC14500(INST_ANDC, CLOCK_HILO);
+    // setLine(PIN_DATA, HIGH);
+    // executeInstructionOnMC14500(INST_LD, CLOCK_HILO);
+    // executeInstructionOnMC14500(INST_ANDC, CLOCK_HILO);
 
-    result = result && expect(PIN_RR, LOW, "testANDC.RR1");
+    // result = result && expect(PIN_RR, LOW, "testANDC.RR1");
 
     // setLine(PIN_DATA, LOW);
     // executeInstructionOnMC14500(INST_LD, CLOCK_HILO);

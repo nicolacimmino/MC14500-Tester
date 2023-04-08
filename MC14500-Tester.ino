@@ -41,7 +41,11 @@ void loop()
 
   digitalWrite(PIN_LED_RED, LOW);
 
+  Serial.println(F("------------- START -------------"));
+
   powerUpMC14500();
+
+  Serial.println(F("Power up                       OK"));
 
   result = testIEN() &&
            testOEN() &&
@@ -63,6 +67,10 @@ void loop()
   digitalWrite(PIN_LED_RED, !result);
 
   releaseMC14500();
+
+  Serial.println(F("Release DUT                    OK"));
+  Serial.println(F("-------------  END  -------------"));
+  Serial.println("");
 
   // Hang here in case of failure so it's not missed
   // and we can leave the system unattended in ageing
