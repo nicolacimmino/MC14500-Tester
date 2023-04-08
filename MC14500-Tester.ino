@@ -55,7 +55,7 @@ void loop()
            testNOPO() &&
            testORC() &&
            testAND() &&
-           testANDC() &&
+           testANDC() && 
            testXNOR() &&
            testSTOC() &&
            testJMP() &&

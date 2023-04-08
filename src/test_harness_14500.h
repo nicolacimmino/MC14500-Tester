@@ -28,9 +28,9 @@
 #define INST_LD 0x1
 #define INST_LDC 0x2
 #define INST_OR 0x3
-#define INST_ORC 0x4
+#define INST_ANDC 0x4
 #define INST_AND 0x5
-#define INST_ANDC 0x6
+#define INST_ORC 0x6
 #define INST_XNOR 0x7
 #define INST_STO 0x8
 #define INST_STOC 0x9
