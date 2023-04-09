@@ -33,11 +33,11 @@ bool testOEN()
     executeInstructionOnMC14500(INST_LD, CLOCK_HILO);
     executeInstructionOnMC14500(INST_STO, CLOCK_HI);
 
-    result = result && expect(PIN_WRITE, LOW, "testOEN.WRITE");
+    result = result && expect(PIN_WRITE, LOW, "testOEN.WRITE1");
 
     clockMC14500(CLOCK_LO);
 
-    result = result && expect(PIN_RR, HIGH, "testOEN.RR");
+    result = result && expect(PIN_WRITE, LOW, "testOEN.WRITE2");
 
     return result;
 }
