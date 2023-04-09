@@ -2,24 +2,42 @@
 
 bool testLD()
 {
+    bool result = true;
+
     setIen(HIGH);
     setOen(HIGH);
 
     setLine(PIN_DATA, HIGH);
     executeInstructionOnMC14500(INST_LD, CLOCK_HILO);
 
-    return expect(PIN_RR, HIGH, "testLD.RR");
+    result = result && expect(PIN_RR, HIGH, "testLD.RR1");
+
+    setLine(PIN_DATA, LOW);
+    executeInstructionOnMC14500(INST_LD, CLOCK_HILO);
+
+    result = result && expect(PIN_RR, LOW, "testLD.RR2");
+
+    return result;
 }
 
 bool testLDC()
 {
+bool result = true;
+
     setIen(HIGH);
     setOen(HIGH);
 
     setLine(PIN_DATA, HIGH);
     executeInstructionOnMC14500(INST_LDC, CLOCK_HILO);
 
-    return expect(PIN_RR, LOW, "testLDC.RR");
+    result = result && expect(PIN_RR, LOW, "testLDC.RR1");
+
+    setLine(PIN_DATA, LOW);
+    executeInstructionOnMC14500(INST_LDC, CLOCK_HILO);
+
+    result = result && expect(PIN_RR, HIGH, "testLDC.RR2");
+
+    return result;
 }
 
 bool testOEN()
@@ -29,8 +47,6 @@ bool testOEN()
     setIen(HIGH);
     setOen(LOW);
 
-    setLine(PIN_DATA, HIGH);
-    executeInstructionOnMC14500(INST_LD, CLOCK_HILO);
     executeInstructionOnMC14500(INST_STO, CLOCK_HI);
 
     result = result && expect(PIN_WRITE, LOW, "testOEN.WRITE1");
