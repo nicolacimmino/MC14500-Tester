@@ -79,11 +79,11 @@ void clockMC14500(byte phases)
 bool setIen(byte status)
 {
     setLine(PIN_DATA, status);
-    executeInstructionOnMC14500(INST_IEN, CLOCK_HILO);
+    executeInstructionOnMC14500(INST_IEN);
 }
 
 bool setOen(byte status)
 {
     setLine(PIN_DATA, status);
-    executeInstructionOnMC14500(INST_OEN, CLOCK_HILO);
+    executeInstructionOnMC14500(INST_OEN);
 }

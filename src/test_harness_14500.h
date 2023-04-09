@@ -47,7 +47,7 @@
 
 void releaseMC14500();
 void powerUpMC14500();
-void executeInstructionOnMC14500(byte instruction, byte clockPhases);
+void executeInstructionOnMC14500(byte instruction, byte clockPhases = CLOCK_HILO);
 void clockMC14500(byte phases);
 bool setIen(byte status);
 bool setOen(byte status);
