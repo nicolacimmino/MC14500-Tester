@@ -63,6 +63,11 @@ void executeInstructionOnMC14500(byte instruction, byte clockPhases)
 
 void clockMC14500(byte phases)
 {
+    // Note! Because we feed the clock on X2 the phase
+    // is opposite of what you see on datasheets which
+    // refer to X1. So the instruction is latched on
+    // rising edge of the clockand executed on the falling.
+    
     pinMode(PIN_X2, OUTPUT);
 
     if (phases & CLOCK_HI)
