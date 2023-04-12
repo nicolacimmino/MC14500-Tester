@@ -69,5 +69,6 @@ bool testJMP();
 bool testRTN();
 bool testSKZ();
 bool testNOPF();
+bool testX1X2();
 
 #endif

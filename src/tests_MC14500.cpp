@@ -41,7 +41,8 @@ bool runTest()
            testJMP() &&
            testRTN() &&
            testSKZ() &&
-           testNOPF();
+           testNOPF() &&
+           testX1X2();
 
   releaseMC14500();
 
@@ -472,4 +473,17 @@ bool testNOPF()
     executeInstructionOnMC14500(INST_NOPF);
 
     return expect(PIN_FLAGF, HIGH, "testNOPF.FLAGF");
+}
+
+bool testX1X2()
+{
+    bool result = true;
+
+    setLine(PIN_X2, HIGH);
+    result = result && expect(PIN_X1, LOW, "testX1X2.1");
+
+    setLine(PIN_X2, LOW);
+    result = result && expect(PIN_X1, HIGH, "testX1X2.2");
+        
+    return result;
 }
