@@ -17,12 +17,9 @@
 //
 
 #include "src/test_harness.h"
-#include "src/test_harness_14500.h"
-#include "src/tests_MC14500.h"
 
 void setup()
 {
-  releaseMC14500();
   setupTestHarness();
 
   Serial.begin(9600);
@@ -30,8 +27,6 @@ void setup()
 
 void loop()
 {
-  bool result = true;
-
   digitalWrite(PIN_LED_GREEN, LOW);
 
   while (!isButtonPressed())
@@ -41,36 +36,10 @@ void loop()
 
   digitalWrite(PIN_LED_RED, LOW);
 
-  Serial.println(F("------------- START -------------"));
-
-  powerUpMC14500();
-
-  Serial.println(F("Power up                       OK"));
-
-  result = testIEN() &&
-           testOEN() &&
-           testLD() &&
-           testLDC() &&
-           testSTO() &&
-           testNOPO() &&
-           testORC() &&
-           testAND() &&
-           testANDC() && 
-           testXNOR() &&
-           testSTOC() &&
-           testJMP() &&
-           testRTN() &&
-           testSKZ() &&
-           testNOPF();
+  bool result = runTest();
 
   digitalWrite(PIN_LED_GREEN, result);
   digitalWrite(PIN_LED_RED, !result);
-
-  releaseMC14500();
-
-  Serial.println(F("Release DUT                    OK"));
-  Serial.println(F("-------------  END  -------------"));
-  Serial.println("");
 
   // Hang here in case of failure so it's not missed
   // and we can leave the system unattended in ageing
