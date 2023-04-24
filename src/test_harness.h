@@ -44,10 +44,14 @@
 
 #define PRINT_BUFFER_SIZE 80
 
+extern char printBuffer[PRINT_BUFFER_SIZE];
+extern uint8_t failures;
+extern uint8_t asserts;
+
 bool isButtonPressed();
 void setupTestHarness();
 void setLine(byte line, byte level);
 byte readLine(byte line);
-bool expect(byte line, byte value, const char *message);
+void expect(byte line, byte value, const char *message);
 
 #endif

@@ -23,34 +23,42 @@ bool runTest()
 {
     Serial.println(F("------------- START -------------"));
 
-  powerUpMC14500();
+    setupTestHarness();
+    powerUpMC14500();
 
-  Serial.println(F("Power up                       OK"));
+    Serial.println(F("Power up                       OK"));
 
-  bool result = testIEN() &&
-           testOEN() &&
-           testLD() &&
-           testLDC() &&
-           testSTO() &&
-           testNOPO() &&
-           testORC() &&
-           testAND() &&
-           testANDC() && 
-           testXNOR() &&
-           testSTOC() &&
-           testJMP() &&
-           testRTN() &&
-           testSKZ() &&
-           testNOPF() &&
-           testX1X2();
+    testIEN();
+    testOEN();
+    testLD();
+    testLDC();
+    testSTO();
+    testNOPO();
+    testORC();
+    testAND();
+    testANDC();
+    testXNOR();
+    testSTOC();
+    testJMP();
+    testRTN();
+    testSKZ();
+    testNOPF();
+    testX1X2();
 
-  releaseMC14500();
+    releaseMC14500();
 
-  Serial.println(F("Release DUT                    OK"));
-  Serial.println(F("-------------  END  -------------"));
-  Serial.println("");
+    Serial.println(F("Release DUT                    OK"));
 
-  return result;
+    if (failures > 0)
+    {
+        sprintf(printBuffer, "FAILED!\r\n%d/%d", failures, asserts);
+        Serial.println(printBuffer);
+    }
+
+    Serial.println(F("-------------  END  -------------"));
+    Serial.println("");
+
+    return (failures == 0);
 }
 
 void releaseMC14500()
@@ -71,7 +79,7 @@ void powerUpMC14500()
     digitalWrite(PIN_VSS, LOW);
 
     delay(100);
-    
+
     delay(10);
     digitalWrite(PIN_RST, HIGH);
     delay(10);
@@ -115,80 +123,66 @@ void clockMC14500(byte phases)
     }
 }
 
-bool setIen(byte status)
+void setIen(byte status)
 {
     setLine(PIN_DATA, status);
     executeInstructionOnMC14500(INST_IEN);
 }
 
-bool setOen(byte status)
+void setOen(byte status)
 {
     setLine(PIN_DATA, status);
     executeInstructionOnMC14500(INST_OEN);
 }
 
-bool testLD()
+void testLD()
 {
-    bool result = true;
-
     setIen(HIGH);
     setOen(HIGH);
 
     setLine(PIN_DATA, HIGH);
     executeInstructionOnMC14500(INST_LD);
 
-    result = result && expect(PIN_RR, HIGH, "testLD.RR1");
+    expect(PIN_RR, HIGH, "testLD.RR1");
 
     setLine(PIN_DATA, LOW);
     executeInstructionOnMC14500(INST_LD);
 
-    result = result && expect(PIN_RR, LOW, "testLD.RR2");
-
-    return result;
+    expect(PIN_RR, LOW, "testLD.RR2");
 }
 
-bool testLDC()
+void testLDC()
 {
-bool result = true;
-
     setIen(HIGH);
     setOen(HIGH);
 
     setLine(PIN_DATA, HIGH);
     executeInstructionOnMC14500(INST_LDC);
 
-    result = result && expect(PIN_RR, LOW, "testLDC.RR1");
+    expect(PIN_RR, LOW, "testLDC.RR1");
 
     setLine(PIN_DATA, LOW);
     executeInstructionOnMC14500(INST_LDC);
 
-    result = result && expect(PIN_RR, HIGH, "testLDC.RR2");
-
-    return result;
+    expect(PIN_RR, HIGH, "testLDC.RR2");
 }
 
-bool testOEN()
+void testOEN()
 {
-    bool result = true;
-
     setIen(HIGH);
     setOen(LOW);
 
     executeInstructionOnMC14500(INST_STO, CLOCK_HI);
 
-    result = result && expect(PIN_WRITE, LOW, "testOEN.WRITE1");
+    expect(PIN_WRITE, LOW, "testOEN.WRITE1");
 
     clockMC14500(CLOCK_LO);
 
-    result = result && expect(PIN_WRITE, LOW, "testOEN.WRITE2");
-
-    return result;
+    expect(PIN_WRITE, LOW, "testOEN.WRITE2");
 }
 
-bool testSTO()
+void testSTO()
 {
-    bool result = true;
-
     setIen(HIGH);
     setOen(HIGH);
 
@@ -196,38 +190,32 @@ bool testSTO()
     executeInstructionOnMC14500(INST_LD);
     executeInstructionOnMC14500(INST_STO, CLOCK_HI);
 
-    result = result &&
-             expect(PIN_DATA, HIGH, "testSTOH.DATA") &&
-             expect(PIN_WRITE, HIGH, "testSTOH.WRITEH") &&
-             expect(PIN_RR, HIGH, "testSTOH.RR");
+    expect(PIN_DATA, HIGH, "testSTOH.DATA");
+    expect(PIN_WRITE, HIGH, "testSTOH.WRITEH");
+    expect(PIN_RR, HIGH, "testSTOH.RR");
 
     clockMC14500(CLOCK_LO);
 
-    result = result &&
-             expect(PIN_DATA, HIGH, "testSTOH.DATA") &&
-             expect(PIN_WRITE, LOW, "testSTOH.WRITEL") &&
-             expect(PIN_RR, HIGH, "testSTOH.RR");
+    expect(PIN_DATA, HIGH, "testSTOH.DATA");
+    expect(PIN_WRITE, LOW, "testSTOH.WRITEL");
+    expect(PIN_RR, HIGH, "testSTOH.RR");
 
     setLine(PIN_DATA, LOW);
     executeInstructionOnMC14500(INST_LD);
     executeInstructionOnMC14500(INST_STO, CLOCK_HI);
 
-    result = result &&
-             expect(PIN_DATA, LOW, "testSTOL.DATA") &&
-             expect(PIN_WRITE, HIGH, "testSTOL.WRITEH") &&
-             expect(PIN_RR, LOW, "testSTOL.RR");
+    expect(PIN_DATA, LOW, "testSTOL.DATA");
+    expect(PIN_WRITE, HIGH, "testSTOL.WRITEH");
+    expect(PIN_RR, LOW, "testSTOL.RR");
 
     clockMC14500(CLOCK_LO);
 
-    result = result &&
-             expect(PIN_DATA, LOW, "testSTOL.DATA") &&
-             expect(PIN_WRITE, LOW, "testSTOL.WRITEL") &&
-             expect(PIN_RR, LOW, "testSTOH.RR");
-
-    return result;
+    expect(PIN_DATA, LOW, "testSTOL.DATA");
+    expect(PIN_WRITE, LOW, "testSTOL.WRITEL");
+    expect(PIN_RR, LOW, "testSTOH.RR");
 }
 
-bool testIEN()
+void testIEN()
 {
     setIen(LOW);
     setOen(HIGH);
@@ -238,7 +226,7 @@ bool testIEN()
     return expect(PIN_RR, LOW, "testIEN.RR");
 }
 
-bool testNOPO()
+void testNOPO()
 {
     setIen(HIGH);
     setOen(HIGH);
@@ -248,10 +236,8 @@ bool testNOPO()
     return expect(PIN_FLAGO, HIGH, "testNOPO.FLAGO");
 }
 
-bool testORC()
+void testORC()
 {
-    bool result = true;
-
     setIen(HIGH);
     setOen(HIGH);
 
@@ -259,28 +245,24 @@ bool testORC()
     executeInstructionOnMC14500(INST_LD);
     executeInstructionOnMC14500(INST_ORC);
 
-    result = result && expect(PIN_RR, HIGH, "testORC.RR1");
+    expect(PIN_RR, HIGH, "testORC.RR1");
 
     setLine(PIN_DATA, LOW);
     executeInstructionOnMC14500(INST_LD);
     executeInstructionOnMC14500(INST_ORC);
 
-    result = result && expect(PIN_RR, HIGH, "testORC.RR2");
+    expect(PIN_RR, HIGH, "testORC.RR2");
 
     setLine(PIN_DATA, HIGH);
     executeInstructionOnMC14500(INST_LD);
     setLine(PIN_DATA, LOW);
     executeInstructionOnMC14500(INST_ORC);
 
-    result = result && expect(PIN_RR, HIGH, "testORC.RR3");
-
-    return result;
+    expect(PIN_RR, HIGH, "testORC.RR3");
 }
 
-bool testAND()
+void testAND()
 {
-    bool result = true;
-
     setIen(HIGH);
     setOen(HIGH);
 
@@ -288,21 +270,17 @@ bool testAND()
     executeInstructionOnMC14500(INST_LD);
     executeInstructionOnMC14500(INST_AND);
 
-    result = result && expect(PIN_RR, HIGH, "testAND.RR1");
+    expect(PIN_RR, HIGH, "testAND.RR1");
 
     setLine(PIN_DATA, LOW);
     executeInstructionOnMC14500(INST_LD);
     executeInstructionOnMC14500(INST_AND);
 
-    result = result && expect(PIN_RR, LOW, "testAND.RR2");
-
-    return result;
+    expect(PIN_RR, LOW, "testAND.RR2");
 }
 
-bool testANDC()
+void testANDC()
 {
-    bool result = true;
-
     setIen(HIGH);
     setOen(HIGH);
 
@@ -310,28 +288,24 @@ bool testANDC()
     executeInstructionOnMC14500(INST_LD);
     setLine(PIN_DATA, HIGH);
     executeInstructionOnMC14500(INST_ANDC);
-    result = result && expect(PIN_RR, LOW, "testANDC.RR1");
+    expect(PIN_RR, LOW, "testANDC.RR1");
 
     setLine(PIN_DATA, LOW);
     executeInstructionOnMC14500(INST_LD);
     setLine(PIN_DATA, LOW);
     executeInstructionOnMC14500(INST_ANDC);
-    result = result && expect(PIN_RR, LOW, "testANDC.RR2");
+    expect(PIN_RR, LOW, "testANDC.RR2");
 
     setLine(PIN_DATA, HIGH);
     executeInstructionOnMC14500(INST_LD);
     setLine(PIN_DATA, LOW);
     executeInstructionOnMC14500(INST_ANDC);
 
-    result = result && expect(PIN_RR, HIGH, "testANDC.RR3");
-
-    return result;
+    expect(PIN_RR, HIGH, "testANDC.RR3");
 }
 
-bool testXNOR()
+void testXNOR()
 {
-    bool result = true;
-
     setIen(HIGH);
     setOen(HIGH);
 
@@ -339,27 +313,23 @@ bool testXNOR()
     executeInstructionOnMC14500(INST_LD);
     executeInstructionOnMC14500(INST_XNOR);
 
-    result = result && expect(PIN_RR, HIGH, "testXNOR.RR1");
+    expect(PIN_RR, HIGH, "testXNOR.RR1");
 
     setLine(PIN_DATA, LOW);
     executeInstructionOnMC14500(INST_LD);
     executeInstructionOnMC14500(INST_XNOR);
 
-    result = result && expect(PIN_RR, HIGH, "testXNOR.RR2");
+    expect(PIN_RR, HIGH, "testXNOR.RR2");
 
     setLine(PIN_DATA, LOW);
     executeInstructionOnMC14500(INST_LD);
     setLine(PIN_DATA, HIGH);
     executeInstructionOnMC14500(INST_XNOR);
 
-    result = result && expect(PIN_RR, LOW, "testXNOR.RR3");
-
-    return result;
+    expect(PIN_RR, LOW, "testXNOR.RR3");
 }
-bool testSTOC()
+void testSTOC()
 {
-    bool result = true;
-
     setIen(HIGH);
     setOen(HIGH);
 
@@ -367,59 +337,47 @@ bool testSTOC()
     executeInstructionOnMC14500(INST_LD);
     executeInstructionOnMC14500(INST_STOC, CLOCK_HI);
 
-    result = result &&
-             expect(PIN_DATA, LOW, "testSTOCH.DATA") &&
-             expect(PIN_WRITE, HIGH, "testSTOCH.WRITEH") &&
-             expect(PIN_RR, HIGH, "testSTOCH.RR");
+    expect(PIN_DATA, LOW, "testSTOCH.DATA");
+    expect(PIN_WRITE, HIGH, "testSTOCH.WRITEH");
+    expect(PIN_RR, HIGH, "testSTOCH.RR");
 
     clockMC14500(CLOCK_LO);
 
-    result = result &&
-             expect(PIN_DATA, LOW, "testSTOCH.DATA") &&
-             expect(PIN_WRITE, LOW, "testSTOCH.WRITEL") &&
-             expect(PIN_RR, HIGH, "testSTOCH.RR");
+    expect(PIN_DATA, LOW, "testSTOCH.DATA");
+    expect(PIN_WRITE, LOW, "testSTOCH.WRITEL");
+    expect(PIN_RR, HIGH, "testSTOCH.RR");
 
     setLine(PIN_DATA, LOW);
     executeInstructionOnMC14500(INST_LD);
     executeInstructionOnMC14500(INST_STOC, CLOCK_HI);
 
-    result = result &&
-             expect(PIN_DATA, HIGH, "testSTOCL.DATA") &&
-             expect(PIN_WRITE, HIGH, "testSTOCL.WRITEH") &&
-             expect(PIN_RR, LOW, "testSTOCL.RR");
+    expect(PIN_DATA, HIGH, "testSTOCL.DATA");
+    expect(PIN_WRITE, HIGH, "testSTOCL.WRITEH");
+    expect(PIN_RR, LOW, "testSTOCL.RR");
 
     clockMC14500(CLOCK_LO);
 
-    result = result &&
-             expect(PIN_DATA, HIGH, "testSTOCL.DATA") &&
-             expect(PIN_WRITE, LOW, "testSTOCL.WRITEL") &&
-             expect(PIN_RR, LOW, "testSTOCL.RR");
-
-    return result;
+    expect(PIN_DATA, HIGH, "testSTOCL.DATA");
+    expect(PIN_WRITE, LOW, "testSTOCL.WRITEL");
+    expect(PIN_RR, LOW, "testSTOCL.RR");
 }
 
-bool testJMP()
+void testJMP()
 {
-    bool result = true;
-
     setIen(HIGH);
     setOen(HIGH);
 
     executeInstructionOnMC14500(INST_JMP, CLOCK_HI);
 
-    result = result && expect(PIN_JMP, HIGH, "testJMP.JMP1");
+    expect(PIN_JMP, HIGH, "testJMP.JMP1");
 
     clockMC14500(CLOCK_LO);
 
-    result = result && expect(PIN_JMP, HIGH, "testJMP.JMP2");
-
-    return result;
+    expect(PIN_JMP, HIGH, "testJMP.JMP2");
 }
 
-bool testRTN()
+void testRTN()
 {
-    bool result = true;
-
     setIen(HIGH);
     setOen(HIGH);
 
@@ -427,22 +385,18 @@ bool testRTN()
     executeInstructionOnMC14500(INST_LD);
     executeInstructionOnMC14500(INST_RTN);
 
-    result = result && expect(PIN_RTN, HIGH, "testRTN.RTN");
+    expect(PIN_RTN, HIGH, "testRTN.RTN");
 
     setLine(PIN_DATA, LOW);
     executeInstructionOnMC14500(INST_LD);
     executeInstructionOnMC14500(INST_RTN);
     executeInstructionOnMC14500(INST_LDC);
 
-    result = result && expect(PIN_RR, LOW, "testRTN.RR");
-
-    return result;
+    expect(PIN_RR, LOW, "testRTN.RR");
 }
 
-bool testSKZ()
+void testSKZ()
 {
-    bool result = true;
-
     setIen(HIGH);
     setOen(HIGH);
 
@@ -452,7 +406,7 @@ bool testSKZ()
     setLine(PIN_DATA, HIGH);
     executeInstructionOnMC14500(INST_LD);
 
-    result = result && expect(PIN_RR, HIGH, "testSKZ.RR1");
+    expect(PIN_RR, HIGH, "testSKZ.RR1");
 
     setLine(PIN_DATA, LOW);
     executeInstructionOnMC14500(INST_LD);
@@ -460,12 +414,10 @@ bool testSKZ()
     setLine(PIN_DATA, HIGH);
     executeInstructionOnMC14500(INST_LD);
 
-    result = result && expect(PIN_RR, LOW, "testSKZ.RR2");
-
-    return result;
+    expect(PIN_RR, LOW, "testSKZ.RR2");
 }
 
-bool testNOPF()
+void testNOPF()
 {
     setIen(HIGH);
     setOen(HIGH);
@@ -475,15 +427,11 @@ bool testNOPF()
     return expect(PIN_FLAGF, HIGH, "testNOPF.FLAGF");
 }
 
-bool testX1X2()
+void testX1X2()
 {
-    bool result = true;
-
     setLine(PIN_X2, HIGH);
-    result = result && expect(PIN_X1, LOW, "testX1X2.1");
+    expect(PIN_X1, LOW, "testX1X2.1");
 
     setLine(PIN_X2, LOW);
-    result = result && expect(PIN_X1, HIGH, "testX1X2.2");
-        
-    return result;
+    expect(PIN_X1, HIGH, "testX1X2.2");
 }
